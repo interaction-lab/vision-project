@@ -15,6 +15,7 @@ setup(
         'freezegun',
         'mock',
         'mongomock',
+        'pydub',
         'pymongo',
         'pytest',
         'pytest-cov',
