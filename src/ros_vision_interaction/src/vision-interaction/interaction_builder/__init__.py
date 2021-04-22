@@ -7,25 +7,28 @@ from interaction_engine.text_populator import DatabasePopulator
 from interaction_engine.text_populator import VarietyPopulator
 
 
+class Graphs:
+
+    ASK_TO_CHAT = "ask to chat"
+    ASK_TO_DO_PERSEVERANCE = "ask to do perseverance"
+    ASK_TO_DO_SCHEDULED = "ask to do scheduled"
+    CHECK_READING_ID = "check reading id"
+    EVALUATION = "evaluation"
+    FIRST_CHECKIN = "first checkin"
+    GOAL_SETTING = "goal setting"
+    GOODBYE = "goodbye"
+    GREETING = "greeting"
+    MINDFULNESS = "mindfulness"
+    PERSEVERANCE = "perseverance"
+    PROMPTED_CHECKIN = "prompted checkin"
+    REWARD = "reward"
+    SCHEDULED_CHECKIN = "scheduled checkin"
+    SCHEDULE_NEXT_CHECKIN = "schedule next checkin"
+    TALK_ABOUT_VISION = "talk about vision"
+    TOO_MANY_PROMPTED = "too many prompted"
+
+
 class InteractionBuilder:
-    class Graphs:
-        ASK_TO_CHAT = "ask to chat"
-        ASK_TO_DO_PERSEVERANCE = "ask to do perseverance"
-        ASK_TO_DO_SCHEDULED = "ask to do scheduled"
-        CHECK_READING_ID = "check reading id"
-        EVALUATION = "evaluation"
-        FIRST_CHECKIN = "first checkin"
-        GOAL_SETTING = "goal setting"
-        GOODBYE = "goodbye"
-        GREETING = "greeting"
-        MINDFULNESS = "mindfulness"
-        PERSEVERANCE = "perseverance"
-        PROMPTED_CHECKIN = "prompted checkin"
-        REWARD = "reward"
-        SCHEDULED_CHECKIN = "scheduled checkin"
-        SCHEDULE_NEXT_CHECKIN = "schedule next checkin"
-        TALK_ABOUT_VISION = "talk about vision"
-        TOO_MANY_PROMPTED = "too many prompted"
 
     def __init__(
             self,
@@ -43,89 +46,89 @@ class InteractionBuilder:
 
         self._text_populator = TextPopulator(self._variety_populator, self._database_populator)
         self._interactions = {
-            InteractionBuilder.Graphs.ASK_TO_CHAT: self.build_graph_from_dict(
+            Graphs.ASK_TO_CHAT: self.build_graph_from_dict(
                 self._interaction_dict,
-                InteractionBuilder.Graphs.ASK_TO_CHAT,
+                Graphs.ASK_TO_CHAT,
                 self._text_populator,
             ),
-            InteractionBuilder.Graphs.ASK_TO_DO_PERSEVERANCE: self.build_graph_from_dict(
+            Graphs.ASK_TO_DO_PERSEVERANCE: self.build_graph_from_dict(
                 self._interaction_dict,
-                InteractionBuilder.Graphs.ASK_TO_DO_PERSEVERANCE,
+                Graphs.ASK_TO_DO_PERSEVERANCE,
                 self._text_populator,
             ),
-            InteractionBuilder.Graphs.ASK_TO_DO_SCHEDULED: self.build_graph_from_dict(
+            Graphs.ASK_TO_DO_SCHEDULED: self.build_graph_from_dict(
                 self._interaction_dict,
-                InteractionBuilder.Graphs.ASK_TO_DO_SCHEDULED,
+                Graphs.ASK_TO_DO_SCHEDULED,
                 self._text_populator,
             ),
-            InteractionBuilder.Graphs.CHECK_READING_ID: self.build_graph_from_dict(
+            Graphs.CHECK_READING_ID: self.build_graph_from_dict(
                 self._interaction_dict,
-                InteractionBuilder.Graphs.CHECK_READING_ID,
+                Graphs.CHECK_READING_ID,
                 self._text_populator,
             ),
-            InteractionBuilder.Graphs.EVALUATION: self.build_graph_from_dict(
+            Graphs.EVALUATION: self.build_graph_from_dict(
                 self._interaction_dict,
-                InteractionBuilder.Graphs.EVALUATION,
+                Graphs.EVALUATION,
                 self._text_populator,
             ),
-            InteractionBuilder.Graphs.FIRST_CHECKIN: self.build_graph_from_dict(
+            Graphs.FIRST_CHECKIN: self.build_graph_from_dict(
                 self._interaction_dict,
-                InteractionBuilder.Graphs.FIRST_CHECKIN,
+                Graphs.FIRST_CHECKIN,
                 self._text_populator,
             ),
-            InteractionBuilder.Graphs.GOAL_SETTING: self.build_graph_from_dict(
+            Graphs.GOAL_SETTING: self.build_graph_from_dict(
                 self._interaction_dict,
-                InteractionBuilder.Graphs.GOAL_SETTING,
+                Graphs.GOAL_SETTING,
                 self._text_populator,
             ),
-            InteractionBuilder.Graphs.GOODBYE: self.build_graph_from_dict(
+            Graphs.GOODBYE: self.build_graph_from_dict(
                 self._interaction_dict,
-                InteractionBuilder.Graphs.GOODBYE,
+                Graphs.GOODBYE,
                 self._text_populator,
             ),
-            InteractionBuilder.Graphs.GREETING: self.build_graph_from_dict(
+            Graphs.GREETING: self.build_graph_from_dict(
                 self._interaction_dict,
-                InteractionBuilder.Graphs.GREETING,
+                Graphs.GREETING,
                 self._text_populator,
             ),
-            InteractionBuilder.Graphs.MINDFULNESS: self.build_graph_from_dict(
+            Graphs.MINDFULNESS: self.build_graph_from_dict(
                 self._interaction_dict,
-                InteractionBuilder.Graphs.MINDFULNESS,
+                Graphs.MINDFULNESS,
                 self._text_populator,
             ),
-            InteractionBuilder.Graphs.PERSEVERANCE: self.build_graph_from_dict(
+            Graphs.PERSEVERANCE: self.build_graph_from_dict(
                 self._interaction_dict,
-                InteractionBuilder.Graphs.PERSEVERANCE,
+                Graphs.PERSEVERANCE,
                 self._text_populator,
             ),
-            InteractionBuilder.Graphs.PROMPTED_CHECKIN: self.build_graph_from_dict(
+            Graphs.PROMPTED_CHECKIN: self.build_graph_from_dict(
                 self._interaction_dict,
-                InteractionBuilder.Graphs.PROMPTED_CHECKIN,
+                Graphs.PROMPTED_CHECKIN,
                 self._text_populator,
             ),
-            InteractionBuilder.Graphs.REWARD: self.build_graph_from_dict(
+            Graphs.REWARD: self.build_graph_from_dict(
                 self._interaction_dict,
-                InteractionBuilder.Graphs.REWARD,
+                Graphs.REWARD,
                 self._text_populator,
             ),
-            InteractionBuilder.Graphs.SCHEDULED_CHECKIN: self.build_graph_from_dict(
+            Graphs.SCHEDULED_CHECKIN: self.build_graph_from_dict(
                 self._interaction_dict,
-                InteractionBuilder.Graphs.SCHEDULED_CHECKIN,
+                Graphs.SCHEDULED_CHECKIN,
                 self._text_populator,
             ),
-            InteractionBuilder.Graphs.SCHEDULE_NEXT_CHECKIN: self.build_graph_from_dict(
+            Graphs.SCHEDULE_NEXT_CHECKIN: self.build_graph_from_dict(
                 self._interaction_dict,
-                InteractionBuilder.Graphs.SCHEDULE_NEXT_CHECKIN,
+                Graphs.SCHEDULE_NEXT_CHECKIN,
                 self._text_populator,
             ),
-            InteractionBuilder.Graphs.TALK_ABOUT_VISION: self.build_graph_from_dict(
+            Graphs.TALK_ABOUT_VISION: self.build_graph_from_dict(
                 self._interaction_dict,
-                InteractionBuilder.Graphs.TALK_ABOUT_VISION,
+                Graphs.TALK_ABOUT_VISION,
                 self._text_populator,
             ),
-            InteractionBuilder.Graphs.TOO_MANY_PROMPTED: self.build_graph_from_dict(
+            Graphs.TOO_MANY_PROMPTED: self.build_graph_from_dict(
                 self._interaction_dict,
-                InteractionBuilder.Graphs.TOO_MANY_PROMPTED,
+                Graphs.TOO_MANY_PROMPTED,
                 self._text_populator,
             )
         }
