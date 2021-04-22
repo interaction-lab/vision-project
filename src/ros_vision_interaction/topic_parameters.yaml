@@ -7,3 +7,4 @@ controllers:
     interaction: data_capture/is_record_interaction
     perseverance: data_capture/is_record_perseverance
   is_start_interaction: controllers/start_interaction
+  node_name_topic: controllers/node_name

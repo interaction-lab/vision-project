@@ -4,15 +4,17 @@ import datetime
 import pymongo
 import rospy
 import schedule
+import threading
 
 from controllers import VisionProjectDelegator
 from controllers.vision_project_delegator import INITIAL_STATE_DB
+from interaction_builder import Graphs
 from vision_project_tools import init_db
 from vision_project_tools.engine_statedb import EngineStateDb as StateDb
 
 from cordial_msgs.msg import MouseEvent
 from ros_vision_interaction.msg import StartInteractionAction, StartInteractionGoal
-from std_msgs.msg import Bool
+from std_msgs.msg import Bool, String
 
 
 class RosVisionProjectDelegator:
@@ -44,6 +46,7 @@ class RosVisionProjectDelegator:
         is_record_evaluation_topic = rospy.get_param("controllers/is_record/evaluation")
         is_record_perseverance_topic = rospy.get_param("controllers/is_record/perseverance")
         screen_tap_topic = rospy.get_param("cordial/screen_tap")
+        node_name_topic = rospy.get_param('controllers/node_name_topic')
         self._is_record_interaction_publisher = rospy.Publisher(is_record_interaction_topic, Bool, queue_size=1)
         self._is_record_evaluation_publisher = rospy.Publisher(is_record_evaluation_topic, Bool, queue_size=1)
         self._is_record_perseverance_publisher = rospy.Publisher(is_record_perseverance_topic, Bool, queue_size=1)
@@ -53,10 +56,20 @@ class RosVisionProjectDelegator:
             callback=self._screen_tap_listener_callback,
             queue_size=1
         )
+        self._node_name_subscriber = rospy.Subscriber(
+            node_name_topic,
+            String,
+            callback=self._node_name_callback,
+            queue_size=1
+        )
 
         # update scheduler
         self._scheduler = schedule.Scheduler()
         self._scheduler.every(self._seconds_between_updates).seconds.do(self.update)
+
+        self._current_node_name = None
+        self._is_recording_evaluation = False
+        self._is_recording_perseverance = False
 
         self._is_debug = rospy.get_param(
             "vision-project/controllers/is_debug",
@@ -68,6 +81,7 @@ class RosVisionProjectDelegator:
 
     def update(self):
         rospy.loginfo("Running update")
+
         self._delegator.update()
         interaction_type = self._delegator.get_interaction_type()
         if interaction_type is not None:
@@ -84,7 +98,18 @@ class RosVisionProjectDelegator:
             # TODO: add a feedback callback
             rospy.loginfo("Sending goal to start interaction")
             self._start_interaction_client.send_goal(start_interaction_goal)
+            self._is_record_interaction_publisher.publish(True)
+
             self._start_interaction_client.wait_for_result()
+
+            self._is_record_interaction_publisher.publish(False)
+            if self._is_recording_evaluation:
+                self._is_record_evaluation_publisher.publish(False)
+                self._is_recording_evaluation = False
+            if self._is_recording_perseverance:
+                self._is_record_perseverance_publisher.publish(False)
+                self._is_recording_perseverance = False
+
         return
 
     def _screen_tap_listener_callback(self, _):
@@ -101,6 +126,15 @@ class RosVisionProjectDelegator:
         if self._state_database.get("is interaction finished") and enough_time_passed:
             rospy.loginfo("is prompted by user: True")
             self._state_database.set("is prompted by user", True)
+
+    def _node_name_callback(self, node_name):
+        rospy.loginfo(node_name)
+        if node_name == Graphs.EVALUATION:
+            self._is_record_evaluation_publisher.publish(True)
+            self._is_recording_evaluation = True
+        if node_name == Graphs.PERSEVERANCE:
+            self._is_record_perseverance_publisher.publish(True)
+            self._is_recording_perseverance = True
 
 
 if __name__ == "__main__":
