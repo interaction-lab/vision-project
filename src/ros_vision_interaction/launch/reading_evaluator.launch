@@ -1,0 +1,3 @@
+<launch>
+    <node pkg="ros_vision_interaction" type="reading_evaluator.py" name="reading_evaluator" output="screen" />
+</launch>
