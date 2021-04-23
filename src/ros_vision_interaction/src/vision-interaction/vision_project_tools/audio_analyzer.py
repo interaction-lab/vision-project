@@ -21,6 +21,11 @@ class AudioAnalyzer:
             silence_threshold=-20,
             chunk_size=10
     ):
+        if not os.path.exists(copy_directory):
+            os.makedirs(copy_directory)
+        if not os.path.exists(upload_directory):
+            raise FileNotFoundError("The upload directory \'{}\' does not exist".format(upload_directory))
+
         self._upload_directory = upload_directory
         self._copy_directory = copy_directory
         self._file_prefix = file_prefix
@@ -30,13 +35,14 @@ class AudioAnalyzer:
             self._copy_directory,
             "{new_file_name}.{ext}".format(new_file_name=self._new_file_name, ext=self._extension)
         )
-        if not os.path.exists(self._copy_directory):
-            os.makedirs(self._copy_directory)
         self._silence_threshold = silence_threshold
         self._chunk_size = chunk_size
 
     def get_length_of_trimmed_audio(self):
         audio_file = self.find_audio_file()
+        if audio_file is None:
+            logging.info("Evaluation audio file not found")
+            return 0
         self.copy_evaluation_file(audio_file, self._new_audio_file_path)
         audio_segment = self.get_trimmed_audio_segment_from_file(self._new_audio_file_path, self._chunk_size)
         self.save_cropped_audio(audio_segment, self._new_file_name)
