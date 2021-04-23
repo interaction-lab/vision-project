@@ -1,10 +1,10 @@
 cordial:
-  sleep_topic: cordial/sleep
-  screen_tap: cordial/gui/event/mouse
+  sleep_topic: 'cordial/sleep'
+  screen_tap: 'cordial/gui/event/mouse'
 controllers:
   is_record:
-    evaluation: data_capture/is_record_evaluation
-    interaction: data_capture/is_record_interaction
-    perseverance: data_capture/is_record_perseverance
-  is_start_interaction: controllers/start_interaction
-  node_name_topic: controllers/node_name
+    evaluation: 'data_capture/is_record_evaluation'
+    interaction: 'data_capture/is_record_interaction'
+    perseverance: 'data_capture/is_record_perseverance'
+  is_start_interaction: 'controllers/start_interaction'
+  node_name_topic: 'controllers/node_name'
