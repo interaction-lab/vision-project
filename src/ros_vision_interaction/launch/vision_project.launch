@@ -38,7 +38,12 @@
         <arg name="image_topic" value="camera/color/image_raw"/>
         <arg name="is_record_topic" value="data_capture/is_record_interaction"/>
     </include>
-    <!--
+    <include file="$(find audio_capture2)/launch/capture.launch">
+        <arg name="output_directory" value="$(arg upload_directory)"/>
+        <arg name="audio_topic" value="audio/audio"/>
+        <arg name="is_record_topic" value="data_capture/is_record_interaction"/>
+        <arg name="is_launch_audio_capture" value="true"/>
+    </include>
     <include file="$(find audio_capture2)/launch/capture.launch">
         <arg name="output_directory" value="$(arg upload_directory)"/>
         <arg name="audio_topic" value="audio/audio"/>
@@ -48,16 +53,18 @@
     <include file="$(find audio_capture2)/launch/capture.launch">
         <arg name="output_directory" value="$(arg upload_directory)"/>
         <arg name="audio_topic" value="audio/audio"/>
-        <arg name="is_record_topic" value="data_capture/is_record_self_assessment"/>
+        <arg name="is_record_topic" value="data_capture/is_record_perseverance"/>
         <arg name="is_launch_audio_capture" value="false"/>
     </include>
-    -->
 
     <!-- launch controllers -->
     <group if="$(arg is_launch_controllers)">
         <node pkg="ros_vision_interaction" type="ros_vision_project_delegator.py" name="vision_project_delegator" output="screen"/>
         <node pkg="ros_vision_interaction" type="ros_interaction_manager.py" name="interaction_manager" output="screen"/>
     </group>
+
+    <!-- launch reading evaluator -->
+    <node pkg="ros_vision_interaction" type="reading_evaluator.py" name="reading_evaluator" output="screen"/>
 
     <!-- launch mongodb log -->
     <include file="$(find mongodb_store)/launch/mongodb_store.launch">
