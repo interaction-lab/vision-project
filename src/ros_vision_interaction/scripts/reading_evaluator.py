@@ -16,12 +16,18 @@ class ReadingEvaluator:
             statedb
     ):
         self._audio_trimmer = audio_trimmer
-        is_record_evaluation_topic = rospy.get_param("vision-project/controllers/is_record/evaluation")
-        self._is_record_subscriber = rospy.Subscriber(is_record_evaluation_topic, Bool, queue_size=1)
+        is_record_evaluation_topic = rospy.get_param("controllers/is_record/evaluation")
+        self._is_record_subscriber = rospy.Subscriber(
+            is_record_evaluation_topic,
+            Bool,
+            callback=self.is_done_recording_callback,
+            queue_size=1
+        )
         self._state_database = statedb
 
     def is_done_recording_callback(self, is_record):
-        if not is_record:
+        rospy.loginfo(is_record.data)
+        if not is_record.data:
             rospy.loginfo("Evaluator callback starting")
             reading_time = self._audio_trimmer.get_length_of_trimmed_audio()
             reading_eval_index = self._state_database.get("reading eval index")
@@ -30,11 +36,12 @@ class ReadingEvaluator:
             except IndexError or KeyError:
                 num_of_words = 0
             reading_speed = num_of_words/reading_time
+            rospy.loginfo("Reading speed: {}".format(reading_speed))
             self._state_database.set("current eval score", reading_speed)
 
 
 if __name__ == "__main__":
-    rospy.init_node("reading_analyzer")
+    rospy.init_node("reading_evaluator")
     DATABASE_NAME = "vision-project"
     host = rospy.get_param("mongodb/host")
     port = rospy.get_param("mongodb/port")
@@ -56,5 +63,7 @@ if __name__ == "__main__":
         silence_threshold=-20,
         chunk_size=10
     )
+
+    reading_evaluator = ReadingEvaluator(audio_trimmer, state_database)
 
     rospy.spin()
