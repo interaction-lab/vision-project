@@ -104,9 +104,11 @@ class RosVisionProjectDelegator:
 
             self._is_record_interaction_publisher.publish(False)
             if self._is_recording_evaluation:
+                rospy.loginfo("Publishing to stop evaluation audio recording")
                 self._is_record_evaluation_publisher.publish(False)
                 self._is_recording_evaluation = False
             if self._is_recording_perseverance:
+                rospy.loginfo("Publishing to stop perseverance audio recording")
                 self._is_record_perseverance_publisher.publish(False)
                 self._is_recording_perseverance = False
 
@@ -127,12 +129,15 @@ class RosVisionProjectDelegator:
             rospy.loginfo("is prompted by user: True")
             self._state_database.set("is prompted by user", True)
 
-    def _node_name_callback(self, node_name):
+    def _node_name_callback(self, data):
+        node_name = data.data
         rospy.loginfo(node_name)
         if node_name == Graphs.EVALUATION:
+            rospy.loginfo("Publishing to record evaluation audio")
             self._is_record_evaluation_publisher.publish(True)
             self._is_recording_evaluation = True
         if node_name == Graphs.PERSEVERANCE:
+            rospy.loginfo("Publishing to record perseverance audio")
             self._is_record_perseverance_publisher.publish(True)
             self._is_recording_perseverance = True
 

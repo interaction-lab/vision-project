@@ -132,7 +132,6 @@ class InteractionManager:
             plan=self._interaction_builder.interactions[Graphs.CHECK_READING_ID]
         )
         self._planner.insert(
-            pre_hook=self._set_is_record_evaluation,
             plan=self._interaction_builder.interactions[Graphs.EVALUATION],
             post_hook=self._set_vars_after_evaluation
         )
@@ -141,9 +140,6 @@ class InteractionManager:
             post_hook=self._set_vars_after_ask_to_do_perseverance
         )
         return self._planner
-
-    def _set_is_record_evaluation(self):
-        self._state_database.set("is record evaluation", True)
 
     def _build_too_many_prompted(self):
         logging.info("Building checkin limit reminder")
@@ -171,7 +167,6 @@ class InteractionManager:
     def _set_vars_after_ask_to_do_perseverance(self):
         if self._state_database.get("is start perseverance") == "Yes":
             self._planner.insert(
-                pre_hook=self._set_is_record_perseverance,
                 plan=self._interaction_builder.interactions[Graphs.PERSEVERANCE],
                 post_hook=self._set_vars_after_perseverance
             )
@@ -189,9 +184,6 @@ class InteractionManager:
             self._planner.insert(
                 plan=self._interaction_builder.interactions[Graphs.SCHEDULE_NEXT_CHECKIN]
             )
-
-    def _set_is_record_perseverance(self):
-        self._state_database.set("is record perseverance", True)
 
     def _set_vars_after_evaluation(self):
         self._state_database.set("is done eval today", True)
