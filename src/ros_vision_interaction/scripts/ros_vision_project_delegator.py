@@ -4,7 +4,6 @@ import datetime
 import pymongo
 import rospy
 import schedule
-import threading
 
 from controllers import VisionProjectDelegator
 from controllers.vision_project_delegator import INITIAL_STATE_DB
