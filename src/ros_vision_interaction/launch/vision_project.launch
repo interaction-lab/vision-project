@@ -43,18 +43,21 @@
         <arg name="audio_topic" value="audio/audio"/>
         <arg name="is_record_topic" value="data_capture/is_record_interaction"/>
         <arg name="is_launch_audio_capture" value="true"/>
+        <arg name="file_name_prefix" value="''"/>
     </include>
     <include file="$(find audio_capture2)/launch/capture.launch">
         <arg name="output_directory" value="$(arg upload_directory)"/>
         <arg name="audio_topic" value="audio/audio"/>
         <arg name="is_record_topic" value="data_capture/is_record_evaluation"/>
         <arg name="is_launch_audio_capture" value="false"/>
+        <arg name="file_name_prefix" value="evaluation"/>
     </include>
     <include file="$(find audio_capture2)/launch/capture.launch">
         <arg name="output_directory" value="$(arg upload_directory)"/>
         <arg name="audio_topic" value="audio/audio"/>
         <arg name="is_record_topic" value="data_capture/is_record_perseverance"/>
         <arg name="is_launch_audio_capture" value="false"/>
+        <arg name="file_name_prefix" value="perseverance"/>
     </include>
 
     <!-- launch controllers -->
