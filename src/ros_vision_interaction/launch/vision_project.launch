@@ -5,7 +5,21 @@
     <arg name="gui_port" default="8082"/>
     <arg name="is_launch_sound_listener" default="false"/>
     <arg name="is_record_audio" default="true"/>
+
+    <!-- instance_id and params for data_capture multiple nodes-->
+    <arg name="instance_id" value="1"/>
     <arg name="upload_directory" value="/root/upload/"/>
+    <param name="/data_capture/$(arg instance_id)/video_capture/default_param/image_topic" value="camera/color/image_raw"/>
+    <param name="/data_capture/$(arg instance_id)/video_capture/default_param/is_record_topic" value="data_capture/is_record_interaction"/>
+    <param name="/data_capture/$(arg instance_id)/video_capture/default_param/output_directory" value="$(arg upload_directory)"/>
+
+    <!-- instance_id and params for data_capture/audio_capture multiple nodes-->
+    <arg name="is_record_topic_eval" value="data_capture/is_record_evaluation"/> 
+    <arg name="is_record_topic_self" value="data_capture/is_record_self_assessment"/>
+    <param name="/data_capture/$(arg instance_id)/audio_capture/output_directory" value="$(arg upload_directory)"/>
+    <param name="/data_capture/$(arg instance_id)/audio_capture/audio_topic" value="audio/audio"/>
+    <param name="/data_capture/$(arg instance_id)/audio_capture/is_record_topic" value="$(arg is_record_topic_eval)"/>
+
 
     <arg name="mongodb_path" default="/root/mongodb_log" />
     <arg name="mongodb_port" default="62345" />
@@ -34,40 +48,31 @@
         <arg name="bucket_name" default="$(env AWS_BUCKET_NAME)"/>
     </include>
     <include file="$(find video_capture)/launch/capture.launch">
-        <arg name="output_directory" value="$(arg upload_directory)"/>
-        <arg name="image_topic" value="camera/color/image_raw"/>
-        <arg name="is_record_topic" value="data_capture/is_record_interaction"/>
+        <arg name="instance_id" value="$(arg instance_id)"/>
     </include>
-    <include file="$(find audio_capture2)/launch/capture.launch">
-        <arg name="output_directory" value="$(arg upload_directory)"/>
-        <arg name="audio_topic" value="audio/audio"/>
-        <arg name="is_record_topic" value="data_capture/is_record_interaction"/>
-        <arg name="is_launch_audio_capture" value="true"/>
-        <arg name="file_name_prefix" value="''"/>
-    </include>
+    
+    <!--
     <include file="$(find audio_capture2)/launch/capture.launch">
         <arg name="output_directory" value="$(arg upload_directory)"/>
         <arg name="audio_topic" value="audio/audio"/>
         <arg name="is_record_topic" value="data_capture/is_record_evaluation"/>
         <arg name="is_launch_audio_capture" value="false"/>
-        <arg name="file_name_prefix" value="evaluation"/>
+        <arg name="instance_id" value="$(arg instance_id)"/>
     </include>
     <include file="$(find audio_capture2)/launch/capture.launch">
         <arg name="output_directory" value="$(arg upload_directory)"/>
         <arg name="audio_topic" value="audio/audio"/>
-        <arg name="is_record_topic" value="data_capture/is_record_perseverance"/>
+        <arg name="is_record_topic" value="data_capture/is_record_self_assessment"/>
         <arg name="is_launch_audio_capture" value="false"/>
-        <arg name="file_name_prefix" value="perseverance"/>
+        <arg name="instance_id" value="$(arg instance_id)"/>
     </include>
+    -->
 
     <!-- launch controllers -->
     <group if="$(arg is_launch_controllers)">
         <node pkg="ros_vision_interaction" type="ros_vision_project_delegator.py" name="vision_project_delegator" output="screen"/>
         <node pkg="ros_vision_interaction" type="ros_interaction_manager.py" name="interaction_manager" output="screen"/>
     </group>
-
-    <!-- launch reading evaluator -->
-    <node pkg="ros_vision_interaction" type="reading_evaluator.py" name="reading_evaluator" output="screen"/>
 
     <!-- launch mongodb log -->
     <include file="$(find mongodb_store)/launch/mongodb_store.launch">
