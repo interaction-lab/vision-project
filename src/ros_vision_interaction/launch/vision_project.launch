@@ -7,19 +7,29 @@
     <arg name="is_record_audio" default="true"/>
 
     <!-- instance_id and params for data_capture multiple nodes-->
-    <arg name="instance_id" value="1"/>
+    <arg name="video_id" value="1"/>
     <arg name="upload_directory" value="/root/upload/"/>
-    <param name="/data_capture/$(arg instance_id)/video_capture/default_param/image_topic" value="camera/color/image_raw"/>
-    <param name="/data_capture/$(arg instance_id)/video_capture/default_param/is_record_topic" value="data_capture/is_record_interaction"/>
-    <param name="/data_capture/$(arg instance_id)/video_capture/default_param/output_directory" value="$(arg upload_directory)"/>
+    <param name="/data_capture/$(arg video_id)/video_capture/default_param/image_topic" value="camera/color/image_raw"/>
+    <param name="/data_capture/$(arg video_id)/video_capture/default_param/is_record_topic" value="data_capture/is_record_interaction"/>
+    <param name="/data_capture/$(arg video_id)/video_capture/default_param/output_directory" value="$(arg upload_directory)"/>
 
     <!-- instance_id and params for data_capture/audio_capture multiple nodes-->
-    <arg name="is_record_topic_eval" value="data_capture/is_record_evaluation"/> 
-    <arg name="is_record_topic_self" value="data_capture/is_record_self_assessment"/>
-    <param name="/data_capture/$(arg instance_id)/audio_capture/output_directory" value="$(arg upload_directory)"/>
-    <param name="/data_capture/$(arg instance_id)/audio_capture/audio_topic" value="audio/audio"/>
-    <param name="/data_capture/$(arg instance_id)/audio_capture/is_record_topic" value="$(arg is_record_topic_eval)"/>
+    <arg name="audio_id_1" value="1"/>
+    <param name="/data_capture/$(arg audio_id_1)/audio_capture/audio_topic" value="audio/audio"/>
+    <param name="/data_capture/$(arg audio_id_1)/audio_capture/is_record_topic" value="data_capture/is_record_evaluation"/>
+    <param name="/data_capture/$(arg audio_id_1)/audio_capture/output_directory" value="$(arg upload_directory)"/>
 
+    <arg name="audio_id_2" value="2"/>
+    <param name="/data_capture/$(arg audio_id_2)/audio_capture/audio_topic" value="audio/audio"/>
+    <param name="/data_capture/$(arg audio_id_2)/audio_capture/is_record_topic" value="data_capture/is_record_evaluation"/>
+    <param name="/data_capture/$(arg audio_id_2)/audio_capture/output_directory" value="$(arg upload_directory)"/>
+    <param name="/data_capture/$(arg audio_id_2)/audio_capture/file_name_prefix" value="evaluation"/>
+
+    <arg name="audio_id_3" value="3"/>
+    <param name="/data_capture/$(arg audio_id_3)/audio_capture/audio_topic" value="audio/audio"/>
+    <param name="/data_capture/$(arg audio_id_3)/audio_capture/is_record_topic" value="data_capture/is_record_perseverance"/>
+    <param name="/data_capture/$(arg audio_id_3)/audio_capture/output_directory" value="$(arg upload_directory)"/>
+    <param name="/data_capture/$(arg audio_id_3)/audio_capture/file_name_prefix" value="perseverance"/>
 
     <arg name="mongodb_path" default="/root/mongodb_log" />
     <arg name="mongodb_port" default="62345" />
@@ -42,31 +52,26 @@
     <node pkg="topic_tools" type="relay" name="gesture_relay" args="/cordial/gesture/play /qt_robot/gesture/play" />
 
     <!-- launch data capture services -->
-    <!-- audio and video capture for entire interaction -->
     <include file="$(find aws_uploader)/launch/aws_uploader.launch">
         <arg name="upload_directory_path" default="$(arg upload_directory)"/>
         <arg name="bucket_name" default="$(env AWS_BUCKET_NAME)"/>
     </include>
     <include file="$(find video_capture)/launch/capture.launch">
-        <arg name="instance_id" value="$(arg instance_id)"/>
+        <arg name="instance_id" value="$(arg video_id)"/>
     </include>
-    
-    <!--
+    <!-- multiple audio capture nodes -->
     <include file="$(find audio_capture2)/launch/capture.launch">
-        <arg name="output_directory" value="$(arg upload_directory)"/>
-        <arg name="audio_topic" value="audio/audio"/>
-        <arg name="is_record_topic" value="data_capture/is_record_evaluation"/>
-        <arg name="is_launch_audio_capture" value="false"/>
-        <arg name="instance_id" value="$(arg instance_id)"/>
+        <arg name="is_launch_audio_capture" value="true"/>
+        <arg name="instance_id" value="$(arg audio_id_1)"/>
     </include>
     <include file="$(find audio_capture2)/launch/capture.launch">
-        <arg name="output_directory" value="$(arg upload_directory)"/>
-        <arg name="audio_topic" value="audio/audio"/>
-        <arg name="is_record_topic" value="data_capture/is_record_self_assessment"/>
         <arg name="is_launch_audio_capture" value="false"/>
-        <arg name="instance_id" value="$(arg instance_id)"/>
+        <arg name="instance_id" value="$(arg audio_id_2)"/>
     </include>
-    -->
+    <include file="$(find audio_capture2)/launch/capture.launch">
+        <arg name="is_launch_audio_capture" value="false"/>
+        <arg name="instance_id" value="$(arg audio_id_3)"/>
+    </include>
 
     <!-- launch controllers -->
     <group if="$(arg is_launch_controllers)">
