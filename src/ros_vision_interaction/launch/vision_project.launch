@@ -16,8 +16,9 @@
     <!-- instance_id and params for data_capture/audio_capture multiple nodes-->
     <arg name="audio_id_1" value="1"/>
     <param name="/data_capture/$(arg audio_id_1)/audio_capture/audio_topic" value="audio/audio"/>
-    <param name="/data_capture/$(arg audio_id_1)/audio_capture/is_record_topic" value="data_capture/is_record_evaluation"/>
+    <param name="/data_capture/$(arg audio_id_1)/audio_capture/is_record_topic" value="data_capture/is_record_interaction"/>
     <param name="/data_capture/$(arg audio_id_1)/audio_capture/output_directory" value="$(arg upload_directory)"/>
+    <param name="/data_capture/$(arg audio_id_1)/audio_capture/file_name_prefix" value="interaction"/>
 
     <arg name="audio_id_2" value="2"/>
     <param name="/data_capture/$(arg audio_id_2)/audio_capture/audio_topic" value="audio/audio"/>
