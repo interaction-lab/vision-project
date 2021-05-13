@@ -3,6 +3,7 @@ import glob
 import logging
 import os
 import shutil
+import time
 
 from pydub import AudioSegment
 
@@ -19,7 +20,8 @@ class AudioAnalyzer:
             new_file_name,
             extension="wav",
             silence_threshold=-20,
-            chunk_size=10
+            chunk_size=10,
+            seconds_to_check_for_audio_files=5
     ):
         if not os.path.exists(copy_directory):
             os.makedirs(copy_directory)
@@ -37,6 +39,7 @@ class AudioAnalyzer:
         )
         self._silence_threshold = silence_threshold
         self._chunk_size = chunk_size
+        self._seconds_to_check_for_audio_files = seconds_to_check_for_audio_files
 
     def get_length_of_trimmed_audio(self):
         audio_file = self.find_audio_file()
@@ -70,15 +73,18 @@ class AudioAnalyzer:
         return ms_to_trim
 
     def find_audio_file(self):
-        list_of_audio_files = glob.glob(os.path.join(self._upload_directory, "*." + self._extension))
+        list_of_audio_files = []
+        for _ in range(2*self._seconds_to_check_for_audio_files):
+            list_of_audio_files = glob.glob(os.path.join(self._upload_directory, "*." + self._extension))
+            if len(list_of_audio_files) > 0:
+                break
+            time.sleep(0.5)
         for file in list_of_audio_files:
-            parts = file.split("\\")
-            file_name = parts[len(parts)-1]
-            if file_name.startswith(self._file_prefix):
+            if file.find(self._file_prefix) >= 0:
                 return file
 
     def copy_evaluation_file(self, file, dest):
-        shutil.copy(file, dest)
+        shutil.copyfile(file, dest)
 
     def save_cropped_audio(self, audio_segment, new_file_name):
         new_file_path = os.path.join(self._copy_directory, new_file_name)
