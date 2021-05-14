@@ -1,7 +1,6 @@
 import logging
 
 from vision_project_tools.engine_statedb import EngineStateDb
-from vision_project_tools.audio_analyzer import AudioAnalyzer
 from vision_project_tools.vision_engine import VisionInteractionEngine
 
 logging.basicConfig(level=logging.INFO)
