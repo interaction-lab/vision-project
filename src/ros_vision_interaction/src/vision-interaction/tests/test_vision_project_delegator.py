@@ -12,7 +12,7 @@ def vision_project_delegator(statedb):
     return VisionProjectDelegator(
         statedb,
         update_window_seconds=15,
-        minutes_between_interactions=1
+        seconds_between_interactions=1
     )
 
 

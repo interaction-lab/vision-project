@@ -45,13 +45,13 @@ class VisionProjectDelegator:
             statedb,
             update_window_seconds=5,
             scheduled_window_minutes=15,
-            minutes_between_interactions=1,
+            seconds_between_interactions=15,
             max_num_of_prompted_per_day=3
     ):
         self._state_database = statedb
         self._update_window_seconds = datetime.timedelta(seconds=update_window_seconds)
         self._scheduled_window_minutes = datetime.timedelta(minutes=scheduled_window_minutes)
-        self._minutes_between_interactions = datetime.timedelta(minutes=minutes_between_interactions)
+        self._seconds_between_interactions = datetime.timedelta(seconds=seconds_between_interactions)
         self._max_num_of_prompted_per_day = max_num_of_prompted_per_day
 
         self._is_run_interaction = False
@@ -97,19 +97,20 @@ class VisionProjectDelegator:
         self._state_database.set("last 5 eval scores", last_5_scores)
 
     def get_interaction_type(self):
-        logging.info("Determining interaction type")
-        if self._is_first_interaction():
-            interaction_type = Interactions.FIRST_INTERACTION
-        elif self._is_time_for_scheduled_interaction():
-            interaction_type = Interactions.SCHEDULED_INTERACTION
-        elif self._is_run_too_many_prompted():
-            interaction_type = Interactions.TOO_MANY_PROMPTED
-        elif self._is_run_prompted_interaction():
-            interaction_type = Interactions.PROMPTED_INTERACTION
-        elif self._is_ask_to_do_evaluation():
-            interaction_type = Interactions.ASK_TO_DO_EVALUATION
-        else:
-            interaction_type = None
+        # logging.info("Determining interaction type")
+        # if self._is_first_interaction():
+        #     interaction_type = Interactions.FIRST_INTERACTION
+        # elif self._is_time_for_scheduled_interaction():
+        #     interaction_type = Interactions.SCHEDULED_INTERACTION
+        # elif self._is_run_too_many_prompted():
+        #     interaction_type = Interactions.TOO_MANY_PROMPTED
+        # elif self._is_run_prompted_interaction():
+        #     interaction_type = Interactions.PROMPTED_INTERACTION
+        # elif self._is_ask_to_do_evaluation():
+        #     interaction_type = Interactions.ASK_TO_DO_EVALUATION
+        # else:
+        #     interaction_type = None
+        interaction_type = Interactions.ASK_TO_DO_EVALUATION
         return interaction_type
 
     def _is_first_interaction(self):

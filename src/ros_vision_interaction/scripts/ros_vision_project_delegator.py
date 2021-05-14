@@ -21,10 +21,9 @@ class RosVisionProjectDelegator:
     def __init__(
             self,
             vision_project_delegator,
+            seconds_between_interactions=15
     ):
-        self._minutes_between_interactions = datetime.timedelta(
-            minutes=rospy.get_param("vision-project/controllers/minutes_between_interactions")
-        )
+        self._seconds_between_interactions = datetime.timedelta(seconds_between_interactions)
         self._scheduled_time_window_minutes = datetime.timedelta(
             minutes=rospy.get_param("vision-project/controllers/scheduled_window_minutes")
         )
@@ -103,7 +102,7 @@ class RosVisionProjectDelegator:
 
             self._is_record_interaction_publisher.publish(False)
             if self._is_recording_evaluation:
-                rospy.loginfo("Publishing to stop evaluation audio recording")
+                rospy.loginfo(f"Publishing to stop evaluation audio recording at {datetime.datetime.now()}")
                 self._is_record_evaluation_publisher.publish(False)
                 self._is_recording_evaluation = False
             if self._is_recording_perseverance:
@@ -118,7 +117,7 @@ class RosVisionProjectDelegator:
         # TODO: change time btwn interactions to a few seconds
         if last_interaction_time is not None:
             enough_time_passed = datetime.datetime.now() - self._state_database.get("last interaction datetime") \
-                                 > self._minutes_between_interactions
+                                 > self._seconds_between_interactions
             if not enough_time_passed:
                 rospy.loginfo("Not enough time passed to initiate an interaction")
         else:
@@ -132,7 +131,7 @@ class RosVisionProjectDelegator:
         node_name = data.data
         rospy.loginfo(node_name)
         if node_name == Graphs.EVALUATION:
-            rospy.loginfo("Publishing to record evaluation audio")
+            rospy.loginfo(f"Publishing to record evaluation audio at {datetime.datetime.now()}")
             self._is_record_evaluation_publisher.publish(True)
             self._is_recording_evaluation = True
         if node_name == Graphs.PERSEVERANCE:
@@ -157,17 +156,20 @@ if __name__ == "__main__":
 
     update_window_seconds = rospy.get_param("vision-project/controllers/update_window_seconds")
     scheduled_window_minutes = rospy.get_param("vision-project/controllers/scheduled_window_minutes")
-    minutes_between_interactions = rospy.get_param("vision-project/controllers/minutes_between_interactions")
+    seconds_between_interactions = rospy.get_param("vision-project/controllers/seconds_between_interactions")
     max_num_of_prompted_per_day = rospy.get_param("vision-project/params/max_num_of_prompted_per_day")
 
     vision_project_delegator = VisionProjectDelegator(
         statedb=state_database,
         update_window_seconds=update_window_seconds,
-        minutes_between_interactions=minutes_between_interactions,
+        seconds_between_interactions=seconds_between_interactions,
         max_num_of_prompted_per_day=max_num_of_prompted_per_day
     )
 
-    ros_vision_project_delegator = RosVisionProjectDelegator(vision_project_delegator)
+    ros_vision_project_delegator = RosVisionProjectDelegator(
+        vision_project_delegator,
+        seconds_between_interactions=seconds_between_interactions
+    )
 
     while not rospy.is_shutdown():
         ros_vision_project_delegator.run_scheduler_once()

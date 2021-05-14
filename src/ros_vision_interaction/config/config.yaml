@@ -5,10 +5,10 @@ vision-project:
   controllers:
     is_debug: False
     update_window_seconds: 5
-    minutes_between_interactions: 1
+    seconds_between_interactions: 15
     scheduled_window_minutes: 15
   params:
-    seconds_until_interaction_timeout: 30
+    seconds_until_interaction_timeout: 60
     max_num_of_prompted_per_day: 2
     max_num_of_perseverance_readings: 5
   data:
