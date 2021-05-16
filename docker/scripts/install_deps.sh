@@ -63,7 +63,9 @@ ${PYTHON3_VERSION} -m pip install --user \
 	freezegun==1.0.0 \
 	robotpt_common_utils==0.0.8 \
 	schedule==0.6.0 \
-	pymongo
+	pymongo \
+	pydub \
+	ffmpeg
 
 
 # Setup HTTP server

@@ -27,13 +27,10 @@ class ReadingEvaluator:
             chunk_size=10,
             seconds_to_check_for_audio_files=5
     ):
-        if not os.path.exists(copy_directory):
-            os.makedirs(copy_directory)
         if not os.path.exists(upload_directory):
             raise FileNotFoundError("The upload directory \'{}\' does not exist".format(upload_directory))
 
         self._upload_directory = upload_directory
-        self._copy_directory = copy_directory
         self._file_prefix = file_prefix
         self._extension = extension
         self._silence_threshold = silence_threshold
@@ -111,7 +108,6 @@ if __name__ == "__main__":
     init_db(state_database, INITIAL_STATE_DB)
 
     upload_directory = rospy.get_param("vision-project/data/data_capture")
-    copy_directory = rospy.get_param("vision-project/data/evaluation")
 
     reading_evaluator = ReadingEvaluator(
         state_database,
