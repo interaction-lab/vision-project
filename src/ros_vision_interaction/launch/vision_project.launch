@@ -80,6 +80,9 @@
         <node pkg="ros_vision_interaction" type="ros_interaction_manager.py" name="interaction_manager" output="screen"/>
     </group>
 
+    <!-- launch reading evaluator -->
+    <node pkg="ros_vision_interaction" type="reading_evaluator.py" name="reading_evaluator" output="screen"/>
+    
     <!-- launch mongodb log -->
     <include file="$(find mongodb_store)/launch/mongodb_store.launch">
     	<arg name="db_path" value="$(arg mongodb_path)"/>
