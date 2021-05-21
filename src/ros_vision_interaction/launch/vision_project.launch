@@ -5,6 +5,8 @@
     <arg name="gui_port" default="8082"/>
     <arg name="is_launch_sound_listener" default="false"/>
     <arg name="is_record_audio" default="true"/>
+    <arg name="device" default="hw:1,0"/>
+    <arg name="format" default="wave"/>
 
     <!-- instance_id and params for data_capture multiple nodes-->
     <arg name="video_id" value="1"/>
@@ -64,14 +66,20 @@
     <include file="$(find audio_capture2)/launch/capture.launch">
         <arg name="is_launch_audio_capture" value="true"/>
         <arg name="instance_id" value="$(arg audio_id_1)"/>
+        <arg name="device" value="$(arg device)"/>
+        <arg name="format" value="$(arg format)"/>
     </include>
     <include file="$(find audio_capture2)/launch/capture.launch">
         <arg name="is_launch_audio_capture" value="false"/>
         <arg name="instance_id" value="$(arg audio_id_2)"/>
+        <arg name="device" value="$(arg device)"/>
+        <arg name="format" value="$(arg format)"/>
     </include>
     <include file="$(find audio_capture2)/launch/capture.launch">
         <arg name="is_launch_audio_capture" value="false"/>
         <arg name="instance_id" value="$(arg audio_id_3)"/>
+        <arg name="device" value="$(arg device)"/>
+        <arg name="format" value="$(arg format)"/>
     </include>
 
     <!-- launch controllers -->
