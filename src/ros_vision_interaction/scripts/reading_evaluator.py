@@ -50,42 +50,25 @@ class ReadingEvaluator:
         rospy.loginfo(is_record.data)
         if not is_record.data:
             rospy.loginfo("Evaluator callback starting")
-            reading_time = self.get_length_of_trimmed_audio()
+            audio_file = self.find_audio_file()
+            reading_time = self.get_length_of_trimmed_audio(audio_file)
             reading_eval_index = self._state_database.get("reading eval index")
             try:
                 num_of_words = self._state_database.get("reading eval data")[reading_eval_index]["word count"]
             except IndexError or KeyError:
                 rospy.logerr(f"Reading task data not found for index:{reading_eval_index}")
                 num_of_words = 0
-            reading_speed = num_of_words/reading_time
-            rospy.loginfo("Reading speed: {}".format(reading_speed))
+            try:
+                reading_speed = num_of_words/reading_time
+                rospy.loginfo("Reading speed: {}".format(reading_speed))
+            except ZeroDivisionError:
+                rospy.logerr("Reading time is 0, setting reading speed to 0")
+                reading_speed = 0
             self._state_database.set("current eval score", reading_speed)
-
-    def get_length_of_trimmed_audio(self):
-        audio_file = self.find_audio_file()
-        if audio_file is None:
-            rospy.loginfo("Evaluation audio file not found")
-            return 0
-        audio_segment = self.get_and_trim_audio_from_file(audio_file, self._silence_threshold, self._chunk_size)
-        return audio_segment.duration_seconds
-
-    def get_and_trim_audio_from_file(self, file_name, silence_threshold, chunk_size):
-        if not file_name.endswith(self._extension):
-            raise TypeError("Must be a {} file".format(self._extension))
-        rospy.loginfo(f"File name: {file_name}")
-        audio = AudioSegment.from_wav(file_name)
-        leading_silence_index = silence.detect_leading_silence(audio, silence_threshold, chunk_size)
-        audio.reverse()
-        ending_silence_index = silence.detect_leading_silence(audio, silence_threshold, chunk_size)
-        full_audio_length = len(audio)
-        trimmed_audio = audio[leading_silence_index:full_audio_length - ending_silence_index]
-        rospy.loginfo(f"Original audio length: {audio.duration_seconds}")
-        rospy.loginfo(f"Trimmed audio length: {trimmed_audio.duration_seconds}")
-        return trimmed_audio
 
     def find_audio_file(self):
         list_of_audio_files = []
-        for _ in range(2*self._seconds_to_check_for_audio_files):
+        for _ in range(self._seconds_to_check_for_audio_files):
             list_of_audio_files = glob.glob(os.path.join(self._upload_directory, "*." + self._extension))
             if len(list_of_audio_files) > 0:
                 break
@@ -93,6 +76,27 @@ class ReadingEvaluator:
         for file in list_of_audio_files:
             if file.find(self._file_prefix) >= 0:
                 return file
+
+    def get_length_of_trimmed_audio(self, audio_file):
+        if audio_file is None:
+            rospy.loginfo("No audio file passed")
+            return 0
+
+        if not audio_file.endswith(self._extension):
+            raise TypeError("Must be a {} file".format(self._extension))
+
+        rospy.loginfo(f"File name: {audio_file}")
+        audio_segment = AudioSegment.from_wav(audio_file)
+        full_audio_length = len(audio_segment)
+        rospy.loginfo(f"Original audio length: {audio_segment.duration_seconds}")
+
+        leading_silence_index = silence.detect_leading_silence(audio_segment, self._silence_threshold, self._chunk_size)
+        audio_segment.reverse()
+        ending_silence_index = silence.detect_leading_silence(audio_segment, self._silence_threshold, self._chunk_size)
+
+        trimmed_audio = audio_segment[leading_silence_index:full_audio_length - ending_silence_index]
+        rospy.loginfo(f"Trimmed audio length: {trimmed_audio.duration_seconds}")
+        return audio_segment.duration_seconds
 
 
 if __name__ == "__main__":
