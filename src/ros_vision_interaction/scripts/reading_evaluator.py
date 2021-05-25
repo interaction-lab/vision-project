@@ -27,6 +27,7 @@ class ReadingEvaluator:
             file_prefix,
             extension="wav",
             silence_threshold=-35,
+            sample_rate=16000,
             chunk_size=10,
             seconds_to_check_for_audio_files=5
     ):
@@ -37,6 +38,7 @@ class ReadingEvaluator:
         self._file_prefix = file_prefix
         self._extension = extension
         self._silence_threshold = silence_threshold
+        self._sample_rate = sample_rate
         self._chunk_size = chunk_size
         self._seconds_to_check_for_audio_files = seconds_to_check_for_audio_files
 
@@ -49,6 +51,7 @@ class ReadingEvaluator:
         )
 
         self._state_database = statedb
+        self._sr = speech_recognition.Recognizer()
         self._vad = webrtcvad.Vad()
         self._vad.set_mode(1)
 
@@ -94,40 +97,74 @@ class ReadingEvaluator:
 
         rospy.loginfo(f"File name: {audio_file}")
         audio_segment = AudioSegment.from_wav(audio_file)
-        audio_segment = self._amplify_speech(audio_segment)
+        original_length = audio_segment.duration_seconds
 
         silent_segments = silence.detect_silence(audio_segment, silence_thresh=self._silence_threshold)
-        leading_silence_index = silent_segments[0][1]
-        ending_silence_index = silent_segments[len(silent_segments)-1][0]
-        rospy.loginfo(f"Leading silence index: {leading_silence_index}, ending silence index: {ending_silence_index}")
+        if len(silent_segments) > 0:
+            leading_silence_index = silent_segments[0][1]
+            ending_silence_index = silent_segments[len(silent_segments)-1][0]
+            rospy.loginfo(f"Leading silence index: {leading_silence_index}, ending silence index: {ending_silence_index}")
+            audio_segment = audio_segment[leading_silence_index:ending_silence_index]
+        else:
+            rospy.loginfo("No silence detected at beginning or end of audio")
 
-        trimmed_audio = audio_segment[leading_silence_index:ending_silence_index]
         file_path = f"/root/audio_test/trimmed_{datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.wav"
-        trimmed_audio.export(
+        audio_segment.export(
             file_path,
             format="wav"
         )
-        self._analyze_loudness(trimmed_audio)
+        self._analyze_loudness(audio_segment)
         rospy.loginfo(
-            f"Original length: {audio_segment.duration_seconds}\nTrimmed length: {trimmed_audio.duration_seconds}"
+            f"Original length: {original_length}, trimmed length: {audio_segment.duration_seconds}"
         )
+
+        rospy.loginfo(self._get_transcript(audio_file))
+
         return audio_segment.duration_seconds
     
-    def _amplify_speech(self, audio_segment, chunk_size=10):
+    def _amplify_speech(self, audio_file, chunk_size=10):
+        audio_segment = AudioSegment.from_wav(audio_file)
+        new_segment = AudioSegment.empty()
+
         start_index = 0
         duration = len(audio_segment)
-        # while start_index < duration:
-        #     if audio_segment[start_index:start_index+chunk_size]:
-        #         audio_segment[start_index:start_index+chunk_size].apply_gain(20)
-        #         start_index += chunk_size
-        self._analyze_loudness(audio_segment)
-        audio_segment = audio_segment.apply_gain(+10)
+        while start_index < duration:
+            segment = audio_segment[start_index:start_index+chunk_size]
+            raw_segment = segment.raw_data
+            if self._vad.is_speech(raw_segment, self._sample_rate, 160):
+                segment = segment.apply_gain(+10)
+            new_segment += segment
+            start_index += chunk_size
+
         file_path = f"/root/audio_test/test_{datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.wav"
         audio_segment.export(
             file_path,
             format="wav"
         )
+        file_path = f"/root/audio_test/amplified_{datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.wav"
+        new_segment = AudioSegment(
+            data=new_segment,
+            sample_width=2,
+            frame_rate=self._sample_rate,
+            channels=1
+        )
+        new_segment.raw_data.export(
+            file_path,
+            format="wav"
+        )
         return audio_segment
+
+    def _get_transcript(self, audio_file):
+        with speech_recognition.AudioFile(audio_file) as source:
+            audio = speech_recognition.Recognizer().record(source)
+            try:
+                transcript = self._sr.recognize_google(audio)
+            except speech_recognition.UnknownValueError:
+                rospy.logerr("Audio could not be transcribed")
+                transcript = ""
+            except speech_recognition.RequestError:
+                rospy.logerr("Recognizer could not connect")
+        return transcript
 
     def _analyze_loudness(self, audio_segment, chunk_size=10):
         loudness_array = []
