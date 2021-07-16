@@ -3,7 +3,7 @@
         "nodes": {
             "introduction": {
                 "transitions": ["exit"],
-                "content": "Hi, my name is QT!",
+                "content": "Hi, welcome to the interaction lab!",
                 "options": ["Nice to meet you"],
                 "message_type": "multiple choice"
             }

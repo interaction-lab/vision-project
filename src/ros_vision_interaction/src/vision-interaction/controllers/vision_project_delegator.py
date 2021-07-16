@@ -48,7 +48,7 @@ class VisionProjectDelegator:
             scheduled_window_minutes=15,
             minutes_between_interactions=1,
             max_num_of_prompted_per_day=3,
-            is_run_demo=False
+            is_run_demo=True
     ):
         self._state_database = statedb
         self._update_window_seconds = datetime.timedelta(seconds=update_window_seconds)
